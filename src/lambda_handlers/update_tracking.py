@@ -10,8 +10,8 @@ import os
 import uuid
 import base64
 import pathlib
-import datatier
-import webservice
+import src.datatier as datatier
+import src.webservice as webservice
 import urllib.parse
 import string
 import cryptography

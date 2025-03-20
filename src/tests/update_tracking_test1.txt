@@ -1,0 +1,3 @@
+{
+  "query": "is:slick cmc:cmc"
+}
