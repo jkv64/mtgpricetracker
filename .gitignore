@@ -1,3 +1,6 @@
 # don't want to publicize config file
 mtgpricetracker.ini
+mtgpricetracker-client.ini
+
+# this is for 310 Project submission
 readme.txt

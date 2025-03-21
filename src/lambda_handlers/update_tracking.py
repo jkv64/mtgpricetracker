@@ -1,5 +1,6 @@
 #
-# Python program to search Scryfall for cards and add them to a tracking database
+# Python program to poll the Scryfall API for fetchland information
+# and update a database
 #
 # Written by Jack Vogel using template code from Joe Hummel (Northwestern CS310)
 #
@@ -10,8 +11,8 @@ import os
 import uuid
 import base64
 import pathlib
-import src.datatier as datatier
-import src.webservice as webservice
+import datatier
+import webservice
 import urllib.parse
 import string
 import cryptography
@@ -57,16 +58,18 @@ def lambda_handler(event, context):
   
     url = "https://api.scryfall.com/cards/search?q="
 
-    # expecting the body of the request to have a query parameter
-    if "query" in event:
-      query = event["query"]
-    elif "pathParameters" in event:
-      if "query" in event["pathParameters"]:
-        query = event["pathParameters"]["query"]
+    print(event)
+
+    # expecting the request body  to have a query parameter
+    if "body" in event:
+      print(event["body"])
+      body = json.loads(event["body"])
+      if "query" in body:
+        query = body["query"]
       else:
-        raise Exception("requires query parameter in pathParameters")
+        raise Exception("requires query parameter in request body")
     else:
-        raise Exception("requires query parameter in event")
+      raise Exception("requires body with data")
 
     print("User's query: ", query)
 
