@@ -5,12 +5,12 @@ This is a webservice that records the prices of the fetchlands (and more cards) 
 The service is built using AWS Lambda functions executed through AWS Cloudwatch events or the AWS API Gateway. This repository has the lambda function handlers as [lambda_fxn_name].py, as well as datatier.py and webservice.py which are sets of helper methods built by Prof. Hummel and edited by me. exampleconfig.ini shows the framework of the config file that the python file parses to be able to access AWS resources. It needs to be filled in with appropriate credentials if you want to build this service yourself.
 
 Current API services at https://5mvvd2iv46.execute-api.us-east-2.amazonaws.com/prod
- - /pricedrop/{numdays}
+ - GET /pricedrop/{numdays}
     - Gives the fetchland with the largest pricedrop over the last *numdays* days
 
- - /newcards/{query}
-    - Adds up to five cards to the tracking table based on the Scryfall search given by *query*
-    - Note that *query* is passed directly to Scryfall, without the niceties that the in browser version gives, so you'll have to use the exact syntax you want
+ - PUT /newcards
+    - Adds up to five cards to the tracking table based on the Scryfall search given by a query passed in the request body
+    - Note that the query is passed directly to Scryfall, without the niceties that the in browser version gives, so you'll have to use the exact syntax you want
 
 Detailed steps for that setup:
 1. Create IAM users (I called them s3readwrite and s3readonly). The readonly user can use AWS's readonly policy, but you will have to make your own policy that allows the readwrite user to access your S3 buckets.
