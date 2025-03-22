@@ -56,7 +56,7 @@ def lambda_handler(event, context):
 
     conn = datatier.get_dbConn(rds_endpoint, rds_portnum, rds_username, rds_pwd, rds_dbname)
   
-    url = "https://api.scryfall.com/cards/search?q="
+    url = "https://api.scryfall.com/cards/search?q=game%3Apaper+"
 
     # expecting the request body  to have a query parameter
     if "body" in event:
@@ -100,7 +100,10 @@ def lambda_handler(event, context):
 
       
     #otherwise we can get ready to add names to the tracking database
-    today = (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d') #assume cards have already been updated today
+    today = datetime.date.today()
+    if datetime.datetime.now().hour >= 9:
+      today += datetime.timedelta(days=1) #cards have already been updated today
+    today = today.strftime("%Y-%m-%d")
     cutoff = 5
     i = 0
     numadded = 0
