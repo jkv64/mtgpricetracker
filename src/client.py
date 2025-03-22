@@ -466,7 +466,7 @@ def get_price(baseurl, cardname):
     api = '/cardprice/'
     url = baseurl + api + cardname.replace(' ', '+')
 
-    if date is not "":
+    if date != "":
       url += "?date=" + date
 
     # res = requests.get(url)

@@ -22,7 +22,9 @@ Current API services at https://5mvvd2iv46.execute-api.us-east-2.amazonaws.com/p
     - Returns the most recent price of *cardname*
     - Can specify a target date instead of using the most recent price by adding a *date* query string (Ex. /cardprice/{cardname}?date=YYYY-MM-DD)
 
-Detailed steps for that setup:
+If you've downloaded this repo, you can follow the steps in _docker_readme.txt to get a working environment set up, then just run python3 src/client.py to use these web services!
+
+Detailed steps for server side setup:
 1. Create IAM users (I called them s3readwrite and s3readonly). The readonly user can use AWS's readonly policy, but you will have to make your own policy that allows the readwrite user to access your S3 buckets.
 2. Make a copy of exampleconfig.ini (or just edit that I guess), and add start updating it as setup goes. The first step is going to Security Credentials for each of your users and generating access keys. You will need to copy the access key and secret access key into your .ini file.
 3. Create an S3 bucket to hold the zip files for your Lambda layers. Alternatively, you can just upload the zips. If you are using an S3 bucket, be sure to update your config.ini file.
