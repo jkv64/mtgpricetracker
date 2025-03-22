@@ -252,12 +252,17 @@ def best_fetch(baseurl, numdays):
     #
     body = res.json()
 
-    best_card = body["cardname"]
+    best_card = body["cardname"].replace('+', ' ')
     price_diff = body["diff"]
     curr_price = body["price"]
     best_set = body["setcode"]
 
-    print(f"The card with the biggest price drop was {best_card} with a {str(price_diff)} change!")
+    if price_diff < 0:
+      price_diff *= -1
+      print(f"The card with the biggest price drop was {best_card} with a ${price_diff:.2f} drop!")
+    else:
+      print(f"No fetchlands dropped in price, but {best_card} had the smallest gain (${price_diff:.2f})")
+
     print(f"The best printing is {best_set} at ${curr_price}.")
     return
 
@@ -371,7 +376,7 @@ def cards(baseurl):
     body = res.json()
 
     for card in body:
-      print(f"   {card["cardid"]}: {card["name"]} added on {card["date"]}")
+      print(f"   {card["cardid"]}: {card["name"].replace('+', ' ')} added on {card["date"]}")
     
     return
 
@@ -428,7 +433,7 @@ def prices(baseurl):
     body = res.json()
 
     for price in body:
-      print(f"   {price["priceid"]}: {price["name"]}'s {price["set"]} printing was ${price["price"]} on {price["date"]}")
+      print(f"   {price["priceid"]}: {price["name"].replace('+', ' ')}'s {price["set"]} printing was ${price["price"]} on {price["date"]}")
     
     return
 
