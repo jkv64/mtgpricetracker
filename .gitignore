@@ -1,6 +1,7 @@
 # don't want to publicize config file
 mtgpricetracker.ini
 mtgpricetracker-client.ini
+mtgpricetracker_lambda_base.zip
 
 # this is for 310 Project submission
 readme.txt

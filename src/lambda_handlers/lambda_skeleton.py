@@ -1,6 +1,5 @@
 #
-# Python program to poll the Scryfall API for fetchland information
-# and update a database
+# Python program to _________________________________
 #
 # Written by Jack Vogel using template code from Joe Hummel (Northwestern CS310)
 #
@@ -15,7 +14,6 @@ import datatier
 import webservice
 import urllib.parse
 import string
-import cryptography
 import datetime
 
 from configparser import ConfigParser
@@ -23,7 +21,7 @@ from configparser import ConfigParser
 def lambda_handler(event, context):
   try:
     print("**STARTING**")
-    print("**adding cards to tracking...**")
+    print("**[doing task]...**")
     
     #
     # setup AWS based on config file:
@@ -55,21 +53,37 @@ def lambda_handler(event, context):
     rds_dbname = configur.get('rds', 'db_name')
 
     conn = datatier.get_dbConn(rds_endpoint, rds_portnum, rds_username, rds_pwd, rds_dbname)
-  
-    url = "https://api.scryfall.com/cards/search?q="
 
-    # expecting the request body  to have a query parameter
-    if "body" in event:
-      print(event["body"])
-      body = json.loads(event["body"])
-      if "query" in body:
-        query = body["query"]
+    # structure for getting path parameters
+    if "cardname" in event:
+      cardname = event["cardname"]
+    elif "pathParameters" in event:
+      if "cardname" in event["pathParameters"]:
+        cardname = event["pathParameters"]["cardname"]
       else:
-        raise Exception("requires query parameter in request body")
+        raise Exception("requires cardname parameter in pathParameters")
     else:
-      raise Exception("requires body with data")
+        raise Exception("requires cardname parameter in event")
+    
+    # structure for getting query string parameters
+    date = datetime.date.today().strftime('%Y-%m-%d')
+    if "queryStringParameters" in event:
+        if "date" in event["queryStringParameters"]:
+            date = event["queryStringParameters"]["date"]
+        else:
+            raise Exception("date is the only expected query parameter")
 
-    print("User's query: ", query)
+  
+    # example sql
+    sql1 = f"SELECT * FROM cards WHERE cardname='{cardname}';"
+    rows = datatier.retrieve_all_rows(conn, sql1)
+    if len(rows) == 0:
+        raise Exception("This card's price is not being tracked")
+    
+    # example Scryfall query
+    url = "https://api.scryfall.com/cards/search?"
+
+    query = "Crag Saurian"
 
     # can't have spaces in the url, but should be able to process other special characters
     new_query = query.replace(" ", "+")
@@ -97,46 +111,17 @@ def lambda_handler(event, context):
           raise Exception(f"Scryfall request returned error \"{code}\" and additional warnings: {details}")
         else:
           raise Exception(f"Scryfall request failed with status code {res.status}")
-
-      
-    #otherwise we can get ready to add names to the tracking database
-    today = (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d') #assume cards have already been updated today
-    cutoff = 5
-    i = 0
-    numadded = 0
-
-    # deserialize and add name to database if it's not already there:
-    for row in body["data"]:
-      # don't want to add too many cards at a time
-      if i >= cutoff:
-        break
-
-      name = row["name"].replace(" ", "+")
-      print(name)
-
-      sql = f"""SELECT * FROM cards WHERE cardname = '{name}';"""
-      rows = datatier.retrieve_all_rows(conn, sql)
-      if len(rows) == 0:
-        print("Card name not present; inserting...")
-        sql = f"""INSERT INTO cards(cardname, dateadded)
-                  values('{name}', '{today}');"""
-        num = datatier.perform_action(conn, sql)
-        if num != 1:
-          raise Exception(f"Failed to insert into database. Affected {num} rows.")
-        else:
-          print(f"Added {name} to the database.")
-          numadded += 1
-      i += 1
-
-    print(f"{numadded}/{i} cards from search were added to tracking!")
-
+        
+    # TODO
+    # do your work!
+       
     return {
       'statusCode': 200,
-      'body': json.dumps(f"Done! Added {numadded} new cards to tracking!")
+      'body': json.dumps({"price": rows[0][0]})
     }
   
   #
-  # on an error, output error from Scryfall:
+  # on an error, try to output error message:
   #
   except Exception as err:
     print("**ERROR**")

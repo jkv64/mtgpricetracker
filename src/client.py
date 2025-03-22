@@ -179,8 +179,11 @@ def prompt():
       print()
       print(">> Enter a command:")
       print("   0 => end")
-      print("   1 => find best fetch")
-      print("   2 => add more cards")
+      print("   1 => cards")
+      print("   2 => prices")
+      print("   3 => find best fetch")
+      print("   4 => add more cards")
+      print("   5 => card price")
 
       cmd = input()
 
@@ -266,7 +269,7 @@ def best_fetch(baseurl, numdays):
   
 ############################################################
 #
-# users
+# add_cards
 #
 def add_cards(baseurl):
   """
@@ -317,6 +320,183 @@ def add_cards(baseurl):
 
   except Exception as e:
     logging.error("**ERROR: add_cards() failed:")
+    logging.error("url: " + url)
+    logging.error(e)
+    return
+  
+############################################################
+#
+# cards
+#
+def cards(baseurl):
+  """
+  Returns all cards being tracked
+
+  Parameters
+  ----------
+  baseurl: baseurl for web service
+
+  Returns
+  -------
+  nothing
+  """
+
+  try:
+    #
+    # call the web service:
+    #
+    api = '/cards'
+    url = baseurl + api
+
+    # res = requests.get(url)
+    res = web_service_get(url)
+
+    #
+    # let's look at what we got back:
+    #
+    if res.status_code == 200: #success
+      pass
+    else:
+      # failed:
+      print("**ERROR: failed with status code:", res.status_code)
+      print("url: " + url)
+      if res.status_code == 500:
+        # we'll have an error message
+        body = res.json()
+        print("Error message:", body)
+      #
+      return
+
+    # if it's successful, we have a list of cards
+    body = res.json()
+
+    for card in body:
+      print(f"   {card["cardid"]}: {card["name"]} added on {card["date"]}")
+    
+    return
+
+  except Exception as e:
+    logging.error("**ERROR: cards() failed:")
+    logging.error("url: " + url)
+    logging.error(e)
+    return
+  
+############################################################
+#
+# prices
+#
+def prices(baseurl):
+  """
+  Returns all price records in the database
+
+  Parameters
+  ----------
+  baseurl: baseurl for web service
+
+  Returns
+  -------
+  nothing
+  """
+
+  try:
+    #
+    # call the web service:
+    #
+    api = '/prices'
+    url = baseurl + api
+
+    # res = requests.get(url)
+    res = web_service_get(url)
+
+    #
+    # let's look at what we got back:
+    #
+    if res.status_code == 200: #success
+      pass
+    else:
+      # failed:
+      print("**ERROR: failed with status code:", res.status_code)
+      print("url: " + url)
+      if res.status_code == 500:
+        # we'll have an error message
+        body = res.json()
+        print("Error message:", body)
+      #
+      return
+
+    # if it's successful, we have a list of cards
+    body = res.json()
+
+    for price in body:
+      print(f"   {price["priceid"]}: {price["name"]}'s {price["set"]} printing was ${price["price"]} on {price["date"]}")
+    
+    return
+
+  except Exception as e:
+    logging.error("**ERROR: prices() failed:")
+    logging.error("url: " + url)
+    logging.error(e)
+    return
+  
+############################################################
+#
+# get_price
+#
+def get_price(baseurl, cardname):
+  """
+  Return a price record for a specific card
+
+  Parameters
+  ----------
+  baseurl: baseurl for web service
+  cardname: the name of the card to find the price of
+
+  Returns
+  -------
+  nothing
+  """
+
+  try:
+
+    date = input("Input a target date in YYYY-MM-DD format or hit enter to use the most recent price> ")
+
+    #
+    # call the web service:
+    #
+    api = '/cardprice/'
+    url = baseurl + api + cardname.replace(' ', '+')
+
+    if date is not "":
+      url += "?date=" + date
+
+    # res = requests.get(url)
+    res = web_service_get(url)
+
+    #
+    # let's look at what we got back:
+    #
+    if res.status_code == 200: #success
+      pass
+    else:
+      # failed:
+      print("**ERROR: failed with status code:", res.status_code)
+      print("url: " + url)
+      if res.status_code == 500:
+        # we'll have an error message
+        body = res.json()
+        print("Error message:", body)
+      #
+      return
+
+    # if it's successful, we have a price
+    body = res.json()
+
+    print(f"Price: ${body["price"]}")
+    
+    return
+
+  except Exception as e:
+    logging.error("**ERROR: prices() failed:")
     logging.error("url: " + url)
     logging.error(e)
     return
@@ -414,10 +594,18 @@ try:
   while cmd != 0:
     #
     if cmd == 1:
+      cards(baseurl)
+    elif cmd == 2:
+      prices(baseurl)
+    elif cmd == 3:
       numdays = input("Enter interval (in days) to check prices over> ")
       best_fetch(baseurl, numdays)
-    elif cmd == 2:
+    elif cmd == 4:
       add_cards(baseurl)
+    elif cmd == 5:
+      cardname = input("What card do you want to know the price of?> ")
+      get_price(baseurl, cardname)
+
     else:
       print("** Unknown command, try again...")
     #
