@@ -11,6 +11,16 @@ Current API services at https://5mvvd2iv46.execute-api.us-east-2.amazonaws.com/p
  - PUT /newcards
     - Adds up to five cards to the tracking table based on the Scryfall search given by a query passed in the request body
     - Note that the query is passed directly to Scryfall, without the niceties that the in browser version gives, so you'll have to use the exact syntax you want
+  
+ - GET /cards
+    - Returns all cards that are currently being tracked
+
+ - GET /prices
+    - Returns all price records in the tracker
+
+ - GET /cardprice/{cardname}
+    - Returns the most recent price of *cardname*
+    - Can specify a target date instead of using the most recent price by adding a *date* query string (Ex. /cardprice/{cardname}?date=YYYY-MM-DD)
 
 Detailed steps for that setup:
 1. Create IAM users (I called them s3readwrite and s3readonly). The readonly user can use AWS's readonly policy, but you will have to make your own policy that allows the readwrite user to access your S3 buckets.
