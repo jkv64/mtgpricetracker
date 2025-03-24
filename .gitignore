@@ -4,3 +4,7 @@ mtgpricetracker_lambda_base.zip
 
 # this is for 310 Project submission
 readme.txt
+
+# don't need to track extra dependencies
+.cache/*
+.local/*
